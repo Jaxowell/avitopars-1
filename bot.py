@@ -29,12 +29,13 @@ class MainBot:
             
     async def stop_parsing(self, message: types.Message):
         user_id = message.from_user.id
-        if user_id not in self.database.load_user_state or not self.database.load_user_state[user_id]['is_running']:
+        user_state = self.database.load_user_state()  # Исправлено: добавлены скобки для вызова метода
+        if user_id not in user_state or not user_state[user_id]['is_running']:
             await message.reply("Парсер уже остановлен.")
         else:
             self.database.save_user_state_running(user_id, False)
             await message.reply("Парсер остановлен.")
-            
+
     async def set_url(self, message: types.Message):
         user_id = message.from_user.id
         if len(message.text.split()) > 1:
@@ -45,12 +46,15 @@ class MainBot:
             self.database.del_urls_from_ads(user_id)
             await message.reply(f"Установлена новая ссылка для парсинга: {url}")
             # Обновляем URL в user_data, если парсинг уже запущен
-            if user_id in self.database.load_user_state:
+            user_states = self.database.load_user_state()  # Обратите внимание на вызов метода
+            if user_id in user_states:
                 self.database.save_user_state_url(user_id, url)
             else:
                 self.database.save_user_state(user_id, url, False)
         else:
             await message.reply("Ошибка: ссылка не предоставлена. Используйте: /set_url <ссылка>")
+
+
             
     async def send_msg(self, user_id, text):
         self.bot.send_message(chat_id=user_id, text=text)

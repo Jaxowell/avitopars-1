@@ -41,21 +41,21 @@ class Database:
         self.conn.commit()
     
     def save_user_state_running(self, user_id, is_running):
-        self.cursor.execute("REPLACE INTO user_state WHERE user_id = ? VALUE is_running = ?)", (user_id, is_running,))
+        self.cursor.execute("UPDATE user_state SET is_running = ? WHERE user_id = ?", (is_running, user_id))
         self.conn.commit()
-        
+
     def save_user_state_url(self, user_id, url):
-        self.cursor.execute("REPLACE INTO user_state WHERE user_id = ? VALUE url = ?)", (user_id, url,))
+        self.cursor.execute("UPDATE user_state SET url = ? WHERE user_id = ?", (url, user_id))
         self.conn.commit()
-        
-    def load_user_state(self, user_id):
-        # Исправлен запрос на корректное поле is_running
-        self.cursor.execute("SELECT user_id, url, is_running FROM user_state")
+
+    def load_user_state(self, user_id=None):
+        if user_id:
+            self.cursor.execute("SELECT user_id, url, is_running FROM user_state WHERE user_id = ?", (user_id,))
+        else:
+            self.cursor.execute("SELECT user_id, url, is_running FROM user_state")
         rows = self.cursor.fetchall()
-        # Преобразуем данные в словарь
-        result = {row[0]: {'url': row[1], 'is_running': row[2]} for row in rows}
-        self.logger.info(f"Получена информация о user_id={user_id}: {result}")
-        return result
+        return {row[0]: {'url': row[1], 'is_running': row[2]} for row in rows}
+
 
     def add_ad_id(self, user_id, ad_id):
         try:
@@ -71,5 +71,24 @@ class Database:
     def is_ad_seen(self, user_id, ad_id):
         self.cursor.execute("SELECT 1 FROM ads WHERE user_id = ? AND ad_id = ?", (user_id, ad_id))
         return self.cursor.fetchone() is not None
+
+    
+    def replace_oldest_ads(self, user_id, new_ad_ids):
+        self.cursor.execute("SELECT ad_id FROM ads WHERE user_id = ? ORDER BY rowid ASC", (user_id,))
+        current_ads = [row[0] for row in self.cursor.fetchall()]
+
+        ads_to_keep = (current_ads + new_ad_ids)[-20:]  # Оставляем только последние 20
+        self.cursor.execute("DELETE FROM ads WHERE user_id = ?", (user_id,))
+        self.conn.commit()
+
+        self.cursor.executemany(
+            "INSERT INTO ads (user_id, ad_id) VALUES (?, ?)", 
+            [(user_id, ad_id) for ad_id in ads_to_keep]
+        )
+        self.conn.commit()
+        self.logger.info(f"Обновлены последние 20 ID объявлений для пользователя {user_id}: {ads_to_keep}")
+
+
+
     
     
