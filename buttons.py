@@ -7,7 +7,7 @@ async def menu(message: types.Message):
     # Создаем reply-клавиатуру с кнопками
     reply_keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text='Меню'), KeyboardButton(text='Помощь')]  # Кнопки, которые будут отображаться
+            [KeyboardButton(text='Меню'), KeyboardButton(text='Помощь'), KeyboardButton(text='кто нажмёт тот здохнет')]  # Кнопки, которые будут отображаться
         ],
         resize_keyboard=True  # Для уменьшения размера клавиатуры
     )

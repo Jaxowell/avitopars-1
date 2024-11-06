@@ -1,4 +1,3 @@
-from aiogram.types import Message
 from db import Database
 import asyncio
 from aiogram import Bot, Dispatcher, types
@@ -57,21 +56,17 @@ class MainBot:
         else:
             await message.reply("Ошибка: ссылка не предоставлена. Используйте: /set_url <ссылка>")
 
-
-
-    async def send_msg(self, user_id, text):
-        self.bot.send_message(chat_id=user_id, text=text)
-
     async def help_button_handler(self, message: types.Message):
         """Обработчик для кнопки 'Помощь'."""
         await handle_help(message)  # Отправка справочного сообщения
+    async def send_msg(self, user_id, text):
+        self.bot.send_message(chat_id=user_id, text=text)
 
     async def register_commands(self):
         self.dp.message.register(self.start_parsing, Command(commands=['start']))
         self.dp.message.register(self.stop_parsing, Command(commands=['stop']))
         self.dp.message.register(self.set_url, Command(commands=['set_url']))
         self.dp.message.register(self.help_button_handler, lambda message: message.text == "Помощь")
-
 
     async def start_bot(self):
         await self.register_commands()
