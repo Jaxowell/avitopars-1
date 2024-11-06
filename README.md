@@ -10,7 +10,6 @@ git fetch origin - загрузка удалённых репозиториев
     git merge main (origin/main)
 
 
-
 Часть I - Подготовка
 1) myenv\Scripts\activate - Активация вирт. окр.
 2) Проверяем python --version, когда активируется вирт. окр. Должна быть "3.11.9"
