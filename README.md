@@ -3,12 +3,6 @@
 ...
 pip freeze > requirements.txt - Сохранение зависимостей
 
-Команды git:
-git fetch origin - загрузка удалённых репозиториев
-- Для слияния с основной веткой:
-    git checkout main ... git pull origin main (обновление)
-    git merge main (origin/main)
-
 
 Часть I - Подготовка
 1) myenv\Scripts\activate - Активация вирт. окр.
