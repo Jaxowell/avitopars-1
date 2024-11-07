@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from config import ConfigParser
 from parsing import Parser
 import logging
-from buttons import menu, handle_help
+from buttons import menu, handle_help, handle_contacts
 
 class MainBot:
     def __init__(self, logger: logging.Logger):
@@ -59,6 +59,10 @@ class MainBot:
     async def help_button_handler(self, message: types.Message):
         """Обработчик для кнопки 'Помощь'."""
         await handle_help(message)  # Отправка справочного сообщения
+
+    async def contacts_button_handler(self, message: types.Message):
+        """Обработчик для кнопки 'Кто нажат тот здохнет'."""
+        await handle_contacts(message)  # Отправка справочного сообщения
     async def send_msg(self, user_id, text):
         self.bot.send_message(chat_id=user_id, text=text)
 
@@ -67,6 +71,7 @@ class MainBot:
         self.dp.message.register(self.stop_parsing, Command(commands=['stop']))
         self.dp.message.register(self.set_url, Command(commands=['set_url']))
         self.dp.message.register(self.help_button_handler, lambda message: message.text == "Помощь")
+        self.dp.message.register(self.contacts_button_handler, lambda message: message.text == "кто нажмёт тот здохнет")
 
     async def start_bot(self):
         await self.register_commands()

@@ -7,7 +7,7 @@ async def menu(message: types.Message):
     # Создаем reply-клавиатуру с кнопками
     reply_keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text='Меню'), KeyboardButton(text='Помощь'), KeyboardButton(text='кто нажмёт тот здохнет')]  # Кнопки, которые будут отображаться
+            [KeyboardButton(text='Опции'), KeyboardButton(text='Помощь'), KeyboardButton(text='кто нажмёт тот здохнет')]  # Кнопки, которые будут отображаться
         ],
         resize_keyboard=True  # Для уменьшения размера клавиатуры
     )
@@ -21,3 +21,10 @@ async def handle_help(message: types.Message):
                          "/start - начать работу с ботом\n"
                          "/stop - остановить парсинг\n"
                          "/set_url <ссылка> - установить URL для парсинга.")
+
+
+async def handle_contacts(message: types.Message):
+    await message.answer("Контанты разработчиков:\n"
+                         "@vbudke9999 - Даниил.\n"
+                         "@jaxowell - Данила.\n"
+                         "@Krikozyabra - Влад.")
