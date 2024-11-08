@@ -21,8 +21,23 @@ class Database:
 
         self.cursor.execute("CREATE TABLE IF NOT EXISTS user_urls (user_id INTEGER PRIMARY KEY, url TEXT)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS user_state (user_id INTEGER PRIMARY KEY, url TEXT, is_running BOOLEAN)")
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS authorized_users (user_id INTEGER PRIMARY KEY)""")
         self.conn.commit()
-        
+
+        self.conn.commit()
+
+    # ---- Методы для авторизации пользователей ----
+
+    def is_authorized(self, user_id):
+        self.cursor.execute("SELECT 1 FROM authorized_users WHERE user_id = ?", (user_id,))
+        return self.cursor.fetchone() is not None
+
+    def authorize_user(self, user_id):
+        """Авторизует нового пользователя."""
+        self.cursor.execute("INSERT OR REPLACE INTO authorized_users (user_id) VALUES (?)", (user_id,))
+        self.conn.commit()
+        self.logger.info(f"Пользователь {user_id} успешно авторизован.")
+
     def save_url(self, user_id, url):
         self.cursor.execute("INSERT OR REPLACE INTO user_urls (user_id, url) VALUES (?, ?)", (user_id, url, ))
         self.conn.commit()

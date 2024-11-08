@@ -1,19 +1,31 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram import types
 
 
+async def show_start_menu(message: types.Message):
+    auth_keyboard = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="АВТОРИЗАЦИЯ")]],
+        resize_keyboard=True
+    )
+    await message.answer("Добро пожаловать! Нажмите 'АВТОРИЗАЦИЯ' для доступа.", reply_markup=auth_keyboard)
 
-async def menu(message: types.Message):
-    # Создаем reply-клавиатуру с кнопками
+
+async def show_autorized_menu(message: types.Message):
     reply_keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text='Опции'), KeyboardButton(text='Помощь'), KeyboardButton(text='кто нажмёт тот здохнет')]  # Кнопки, которые будут отображаться
         ],
-        resize_keyboard=True  # Для уменьшения размера клавиатуры
+        resize_keyboard=True
     )
+    await message.answer("Выберите одну из опций...", reply_markup=reply_keyboard)
 
-    # Отправляем сообщение с этой клавиатурой
-    await message.answer("Добро пожаловать! Выберите одну из опций:", reply_markup=reply_keyboard)
+
+async def show_authorization_success(message: types.Message, user_id: str):
+    await message.answer(f"Вы успешно авторизованы, {user_id}!", reply_markup=ReplyKeyboardRemove())
+
+
+async def already_authorized(message: types.Message, user_id: str):
+    await message.answer(f"Добро пожаловать, {user_id}!", reply_markup=ReplyKeyboardRemove())
 
 
 async def handle_help(message: types.Message):
