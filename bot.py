@@ -21,19 +21,33 @@ class MainBot:
     async def contacts_button_handler(message: types.Message):
         await handle_contacts(message)
 
-    async def help_button_handler(self, message: types.Message):
+    @staticmethod
+    async def help_button_handler(message: types.Message):
         await handle_help(message)
 
     async def start_parsing(self, message: types.Message):
         user_id = message.from_user.id
-        self.logger.info(f"Пользователь {user_id} запускает бота.")
-        await show_start_menu(message)
+        self.logger.info(f"Пользователь {user_id} пытается запустить парсинг.")
+        if not self.database.is_authorized(user_id):
+            await message.reply("Вы не авторизованы. Пожалуйста, нажмите 'АВТОРИЗАЦИЯ' для продолжения.")
+            return
         result = self.database.load_url(user_id)
         if result:
             url = result[0]
             self.database.save_user_state(user_id, url, True)
             await message.reply("Парсер запущен.")
-            await self.parser.start_parsing(user_id, self.bot)# Запуск парсера здесь
+            await self.parser.start_parsing(user_id, self.bot)
+        else:
+            await message.reply("Ошибка: URL для парсинга не установлен. Пожалуйста, используйте команду /set_url <ссылка>.")
+
+    async def start_greeting(self, message: types.Message):
+        user_id = message.from_user.id
+        self.logger.info(f"Пользователь {user_id} запустил команду /start.")
+        if not self.database.is_authorized(user_id):
+            await show_start_menu(message)
+        else:
+            await message.reply(f"С возвращением, {message.from_user.username}! Вы уже авторизованы.")
+            await show_autorized_menu(message)
 
     async def handle_authorization(self, message: types.Message):
         user_id = message.from_user.id
@@ -49,7 +63,7 @@ class MainBot:
 
     async def stop_parsing(self, message: types.Message):
         user_id = message.from_user.id
-        user_state = self.database.load_user_state()  # Исправлено: добавлены скобки для вызова метода
+        user_state = self.database.load_user_state()
         if user_id not in user_state or not user_state[user_id]['is_running']:
             await message.reply("Парсер уже остановлен.")
         else:
@@ -60,7 +74,6 @@ class MainBot:
         user_id = message.from_user.id
         if len(message.text.split()) > 1:
             url = message.text.split(' ', 1)[1]
-            # Сохранение URL в таблице user_urls
             self.database.save_url(user_id, url)
             # Очистка базы данных объявлений для пользователя при новом URL
             self.database.del_urls_from_ads(user_id)
@@ -78,7 +91,8 @@ class MainBot:
         self.bot.send_message(chat_id=user_id, text=text)
 
     async def register_commands(self):
-        self.dp.message.register(self.start_parsing, Command(commands=['start']))
+        self.dp.message.register(self.start_greeting, Command(commands=['start']))
+        self.dp.message.register(self.start_parsing, Command(commands=['parsing']))
         self.dp.message.register(self.stop_parsing, Command(commands=['stop']))
         self.dp.message.register(self.set_url, Command(commands=['set_url']))
         self.dp.message.register(self.handle_authorization, lambda message: message.text == "АВТОРИЗАЦИЯ")

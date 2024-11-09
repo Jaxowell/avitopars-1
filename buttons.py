@@ -13,7 +13,8 @@ async def show_start_menu(message: types.Message):
 async def show_autorized_menu(message: types.Message):
     reply_keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text='Опции'), KeyboardButton(text='Помощь'), KeyboardButton(text='кто нажмёт тот здохнет')]  # Кнопки, которые будут отображаться
+            [KeyboardButton(text='Опции'), KeyboardButton(text='Помощь')],
+            [KeyboardButton(text='кто нажмёт тот здохнет')]
         ],
         resize_keyboard=True
     )
@@ -31,12 +32,13 @@ async def already_authorized(message: types.Message, user_id: str):
 async def handle_help(message: types.Message):
     await message.answer("Вот некоторые команды, которые могут вам помочь:\n"
                          "/start - начать работу с ботом\n"
+                         "/parsing - запустить парсинг\n"
                          "/stop - остановить парсинг\n"
                          "/set_url <ссылка> - установить URL для парсинга.")
 
 
 async def handle_contacts(message: types.Message):
-    await message.answer("Контанты разработчиков:\n"
-                         "@vbudke9999 - Даниил.\n"
-                         "@jaxowell - Данила.\n"
-                         "@Krikozyabra - Влад.")
+    await message.answer("Контакты разработчиков:\n"
+                         "@vbudke9999 - Даниил\n"
+                         "@jaxowell - Данила\n"
+                         "@Krikozyabra - Влад")
