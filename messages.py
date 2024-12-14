@@ -3,14 +3,12 @@ from aiogram.types import (
     KeyboardButton,
     ReplyKeyboardRemove,
 )
-import stateManager as sm
 from aiogram import types
 
 import db
 
 
 async def show_mainmenu(message: types.Message):
-    sm.update_state_menu(message.from_user.id, False)
     keyboard = []
     is_parsing = db.get_parsing_status(user_id=message.from_user.id)
     if not is_parsing:
@@ -41,7 +39,6 @@ async def already_authorized(message: types.Message, user_id: str):
 
 
 async def show_url_management_menu(message: types.Message, url_name: str, url: str):
-    sm.update_state_menu(message.from_user.id, True)
     await message.answer(
         "Управление для URL:" + url_name + " - " + url,
         reply_markup=ease_url_settings_list(message.from_user.id, url, url_name),
@@ -60,7 +57,6 @@ def ease_url_settings_list(user_id: int, url: str, url_name: str):
 
 
 def ease_url_list(urls):
-
     # Кнопки: список URL + В главное меню
     keyboard = [[KeyboardButton(text="Настроить: " + name)] for _, name in urls]
     keyboard.append([KeyboardButton(text="В главное меню")])

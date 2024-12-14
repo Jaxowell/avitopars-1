@@ -30,15 +30,13 @@ async def handle_help(message: types.Message):
 @main_menu_router.message(F.text == "Настроить URL")
 async def selectmenu_urls(message: types.Message):
     user_id = message.from_user.id
-    # self.logger.info(f"Пользователь {user_id} открыл меню настроек URL.")
-    db.save_user_state_menu(user_id=user_id, in_url_menu=True)  # Сохраняем состояние
 
     urls = db.get_user_urls(user_id=user_id)
-
     if not urls:
         await message.reply(
-            'У вас нет URL для настройки. Добавьте их с помощью команды /set_url "<название>" <URL>.'
+            "У вас нет URL для настройки. Добавьте их с помощью команды /set_url <название> <URL>."
         )
+        await show_mainmenu(message)
         return
 
     await show_url_list(message, urls)

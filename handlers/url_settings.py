@@ -31,6 +31,7 @@ async def set_url(message: Message, command: CommandObject):
         name, url = args
         try:
             db.save_url(user_id=user_id, url=url, name=name)
+            db.save_url_state(user_id=user_id, url=url, is_running=True)
             await message.reply(
                 f"Добавлен новый URL с названием '{name}' и URL: {url}."
             )
@@ -44,7 +45,7 @@ async def set_url(message: Message, command: CommandObject):
 async def set_parsingstatus_stop(message: Message):
     url_name = message.text.replace("Не отслеживать - ", "")
     url = db.get_url(user_id=message.from_user.id, url_name=url_name)
-    db.save_user_state_running(user_id=message.from_user.id, is_running=False, url=url)
+    db.set_url_state(user_id=message.from_user.id, is_running=False, url=url)
     await message.answer(f"Ссылка с именем {url_name} не будет отслеживаться")
     await selectmenu_urls(message)
 
@@ -53,6 +54,6 @@ async def set_parsingstatus_stop(message: Message):
 async def set_parsingstatus_run(message: Message):
     url_name = message.text.replace("Отслеживать - ", "")
     url = db.get_url(user_id=message.from_user.id, url_name=url_name)
-    db.save_user_state_running(user_id=message.from_user.id, is_running=True, url=url)
+    db.set_url_state(user_id=message.from_user.id, is_running=True, url=url)
     await message.answer(f"Ссылка с именем {url_name} будет отслеживаться")
     await selectmenu_urls(message)
